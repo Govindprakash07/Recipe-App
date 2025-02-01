@@ -1,0 +1,36 @@
+const express = require("express");
+const Recipe = require("../models/Recipe");
+
+const router = express.Router();
+
+// Show All Recipes
+router.get("/", async (req, res) => {
+    const recipes = await Recipe.find();
+    res.render("index", { recipes });
+});
+
+// Add Recipe Page
+router.get("/add", (req, res) => {
+    res.render("addRecipe");
+});
+
+// Handle Adding a Recipe
+router.post("/add", async (req, res) => {
+    const { name, ingredients, instructions, image } = req.body;
+    const newRecipe = new Recipe({ 
+        name, 
+        ingredients: ingredients.split(","), 
+        instructions, 
+        image 
+    });
+    await newRecipe.save();
+    res.redirect("/");
+});
+
+// View Recipe Details
+router.get("/recipe/:id", async (req, res) => {
+    const recipe = await Recipe.findById(req.params.id);
+    res.render("recipeDetails", { recipe });
+});
+
+module.exports = router;
